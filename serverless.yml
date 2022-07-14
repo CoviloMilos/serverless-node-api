@@ -64,7 +64,7 @@ functions:
     name: ${sls:stage}-blocks
     description: Get blocks
     memorySize: 512
-    handler: src/handlers/block-handler.handler
+    handler: src/handlers/block-handler.getBlocks
     events:
       - http:
           path: /blocks
