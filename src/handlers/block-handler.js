@@ -22,7 +22,14 @@ const getBlockByHash = async (event, context, callback) => {
     return response(200, block);
 }
 
+const healthCheck = async () => {
+    return {
+        statusCode: 200,
+        body: {message: "It's healthy"}
+    }
+}
 module.exports = {
     getBlocks,
-    getBlockByHash
+    getBlockByHash,
+    healthCheck
 }
