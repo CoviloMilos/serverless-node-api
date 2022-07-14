@@ -2,3 +2,6 @@ node_modules
 .serverless
 notes.txt
 .middleware/
+notes-lambda.txt
+.gitignore
+.env

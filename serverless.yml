@@ -1,8 +1,11 @@
+org: mcovilo
+app: serverless-demo
 service: serverless-demo
 frameworkVersion: '3'
 
 provider:
   name: aws
+  deploymentMethod: direct # Direct deployments are daster and have no downsides
   stage: dev
   runtime: nodejs14.x
   tracing: 
