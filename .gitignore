@@ -4,4 +4,4 @@ notes.txt
 .middleware/
 notes-lambda.txt
 .gitignore
-.env/
+.env
