@@ -1,0 +1,85 @@
+service: serverless-demo
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  stage: dev
+  runtime: nodejs14.x
+  tracing: 
+    apiGateway: true
+    lambda: true
+
+plugins:
+  - serverless-offline
+  - serverless-middleware
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    noPrependStageInUrl: true
+    httpPort: 3000
+    lambdaPort: 3001
+  middleware:
+    pre:
+      - src/middlewares/pre-middleware.dbConnect
+    pos:
+      - catch: src/middlewares/pos-middleware.errorHandler
+
+functions:
+  # express:
+  #   name: ${sls:stage}-hello
+  #   description: Used to say hello
+  #   memorySize: 512
+  #   handler: src/handlers/express.handler
+  #   events:
+  #     - httpApi: # Here we can expose API for hole resource. For example all /blocks endpoints
+  #         path: /{proxy+}
+  #         method: get
+  #     - http: # Here we specify one endpoint
+  #         path: /hello
+  #         method: get
+  #         cors:
+  #           allowedOrigins:
+  #             - http://example.com
+  #             - http://example2.com
+  #           allowedHeaders:
+  #             - Content-Type
+  #           allowedMethods:
+  #             - GET
+  #           allowCredentials: false
+  getBlocks:
+    name: ${sls:stage}-blocks
+    description: Get blocks
+    memorySize: 512
+    handler: src/handlers/block-handler.getBlocks
+    events:
+      - http:
+          path: /blocks
+          method: get
+  getBlockByHash:
+    name: ${sls:stage}-block-hash
+    description: Get block by hash
+    memorySize: 512
+    handler: src/handlers/block-handler.getBlockByHash
+    events:
+      - http:
+          path: /blocks/{hash}
+          method: get
+  getTransactions:
+    name: ${sls:stage}-transactions
+    description: Get transactions
+    memorySize: 512
+    handler: src/handlers/transaction-handler.getTransactions
+    events:
+      - http:
+          path: /transactions
+          method: get
+  getTransactionByHash:
+    name: ${sls:stage}-transaction-hash
+    description: Get Transaction by hash
+    memorySize: 512
+    handler: src/handlers/transaction-handler.getTransactionByHash
+    events:
+      - http:
+          path: /transactions/{hash}
+          method: get
