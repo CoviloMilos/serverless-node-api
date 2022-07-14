@@ -16,6 +16,7 @@ plugins:
   - serverless-offline
   - serverless-middleware
   - serverless-dotenv-plugin
+  - serverless-api-gateway-caching
 
 custom:
   serverless-offline:
@@ -25,8 +26,17 @@ custom:
   middleware:
     pre:
       - src/middlewares/pre-middleware.dbConnect
-    pos:
-      - catch: src/middlewares/pos-middleware.errorHandler
+    # pos:
+    #   - catch: src/middlewares/pos-middleware.errorHandler
+  apiGatewayCaching:
+    enabled: true
+    clusterSize: '0.5' # defaults to '0.5'
+    ttlInSeconds: 300 # defaults to the maximum allowed: 3600
+    dataEncrypted: true # defaults to false
+    perKeyInvalidation:
+      requireAuthorization: true # default is true
+      handleUnauthorizedRequests: Ignore # default is "IgnoreWithWarning".
+
 
 functions:
   # express:
@@ -54,7 +64,7 @@ functions:
     name: ${sls:stage}-blocks
     description: Get blocks
     memorySize: 512
-    handler: src/handlers/block-handler.getBlocks
+    handler: src/handlers/block-handler.handler
     events:
       - http:
           path: /blocks

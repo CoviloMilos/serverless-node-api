@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "bluebird": "^3.7.2",
     "express": "^4.17.1",
     "mongoose": "^6.4.4"
   },
   "devDependencies": {
-    "serverless-middleware": "^3.0.0",
-    "serverless-offline": "^8.8.1",
+    "serverless-api-gateway-caching": "^1.8.1",
     "serverless-dotenv-plugin": "^4.0.1",
-    "serverless-http": "^2.7.0"
+    "serverless-http": "^2.7.0",
+    "serverless-middleware": "^3.0.0",
+    "serverless-offline": "^8.8.1"
   }
 }

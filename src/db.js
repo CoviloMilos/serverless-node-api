@@ -1,8 +1,11 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const bluebird = require('bluebird');
+mongoose.Promise = bluebird;
+mongoose.Promise = global.Promise;
 
 const connection = {}
 
-module.exports = async () => {
+const dbConnection = async () => {
   console.log('connection -', connection)
 
   if (connection.isConnected) {
@@ -35,4 +38,7 @@ module.exports = async () => {
   })
 
   connection.isConnected = mongoose.connection.readyState
+}
+module.exports = {
+  dbConnection
 }
