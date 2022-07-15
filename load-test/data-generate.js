@@ -139,7 +139,7 @@ function randomBlockHash(requestParams, ctx, ee, next) {
 }
 
 function randomTxHash(requestParams, ctx, ee, next) {
-  ctx.vars["txHash"] = blockHashes[Math.floor(Math.random() * txHashes.length)];
+  ctx.vars["txHash"] = txHashes[Math.floor(Math.random() * txHashes.length)];
  
   return next();
 }
