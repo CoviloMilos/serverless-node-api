@@ -83,7 +83,22 @@ functions:
       - http:
           path: /health
           method: get
-          
+
+  plainSearch:
+    name: ${sls:stage}-plain-search
+    description: Plain search
+    memorySize: 2048
+    handler: src/handlers/search-handler.plainSearch
+    events:
+      - http:
+          path: /search
+          method: get
+          caching:
+            enabled: false # Caching needs to be enabled on all endpoints
+          request:
+            parameters:
+              querystrings:
+                q: true
   getBlocksPaginated:
     name: ${sls:stage}-blocks-paginated
     description: Get blocks paginated
