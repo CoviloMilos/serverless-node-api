@@ -19,8 +19,17 @@ const getTransactionByHash = async (event, context, callback) => {
     return response(200, transaction);
 }
 
+const getTransactionsPaginated = async (event, context, callback) => {
+    const { page } = event.queryStringParameters
+    const perPage = 20;
+
+    const txs = await TransactionModel.find().limit(perPage).skip(perPage * page)
+
+    return response(200, txs);
+}
 
 module.exports = {
     getTransactions,
-    getTransactionByHash
+    getTransactionByHash,
+    getTransactionsPaginated
 }

@@ -6,14 +6,12 @@ mongoose.Promise = global.Promise;
 const connection = {}
 
 const dbConnection = async () => {
-  console.log('connection -', connection)
-
   if (connection.isConnected) {
-    console.log('=> using existing database connection')
+    console.log('=> Using existing database connection')
     return
   }
 
-  console.log('=> using new database connection')
+  console.log('=> Using new database connection')
 
   try {
     await mongoose.connect(process.env.DB)

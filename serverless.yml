@@ -18,6 +18,10 @@ plugins:
   - serverless-dotenv-plugin
   - serverless-api-gateway-caching
 
+package:
+  exclude:
+    - "./load-test"
+
 custom:
   serverless-offline:
     noPrependStageInUrl: true
@@ -28,30 +32,13 @@ custom:
       - src/middlewares/pre-middleware.dbConnect
     # pos:
     #   - catch: src/middlewares/pos-middleware.errorHandler
-  apiGatewayCaching:
-    enabled: true
-    clusterSize: '0.5' # defaults to '0.5'
-    ttlInSeconds: 300 # defaults to the maximum allowed: 3600
-    dataEncrypted: true # defaults to false
-    perKeyInvalidation:
-      requireAuthorization: true # default is true
-      handleUnauthorizedRequests: Ignore # default is "IgnoreWithWarning".
-
-  optimize:
-    debug: true
-    exclude: ['ajv']
-    extensions: ['.extension']
-    external: ['sharp']
-    externalPaths:
-      sharp: 'external_modules/sharp'
-    global: true
-    ignore: ['ajv']
-    includePaths: ['bin/some-binary-file']
-    minify: false
-    prefix: 'dist'
-    plugins: ['transform-decorators-legacy']
-    presets: ['es2017']
-
+  # apiGatewayCaching: # https://levelup.gitconnected.com/serverless-caching-strategies-part-1-amazon-api-gateway-c2d680d5b3b
+  #   enabled: true
+  #   clusterSize: '0.5' # 0.5GB (Gigabytes) The size of the cache cluster for the stage, if enabled.
+  #   ttlInSeconds: 3600 # Specifies the time to live (TTL), in seconds, for cached responses. The higher the TTL, the longer the response will be cached
+  #   perKeyInvalidation:
+  #     requireAuthorization: false # default is true
+  #     handleUnauthorizedRequests: Ignore # default is "IgnoreWithWarning".
 
 functions:
   # express:
@@ -75,48 +62,96 @@ functions:
   #           allowedMethods:
   #             - GET
   #           allowCredentials: false
+  
   health:
     name: ${sls:stage}-health
     description: Health check
-    memorySize: 1024
+    memorySize: 2048  # By default, your functions have 128 MB of memory allocated. Can be up to 10GB
+    # By logs Max Memory Used is 111MB
+    # Adding more memory proportionally increases the amount of CPU
+    # Memory	Duration	Cost
+    # 128 MB	11.722 s	$0.024628
+    # 256 MB	6.678 s	$0.028035
+    # 512 MB	3.194 s	$0.026830
+    # 1024 MB	1.465 s	$0.024638
+    # In this case, at 128 MB, the function takes 11.722 seconds on average to complete, at a cost of $0.024628 for 1,000 invocations. 
+    # When the memory is increased to 1024 MB, the duration average drops to 1.465 seconds, so the cost is $0.024638. 
+    # For a one-thousandth of a cent cost difference, the function has a 10-fold improvement in performance.
+    # https://aws.amazon.com/blogs/compute/operating-lambda-performance-optimization-part-2/#:~:text=You%20can%20configure%20the%20amount,128%20MB%20for%20their%20functions.
     handler: src/handlers/block-handler.healthCheck
     events:
       - http:
           path: /health
           method: get
+          
+  getBlocksPaginated:
+    name: ${sls:stage}-blocks-paginated
+    description: Get blocks paginated
+    memorySize: 2048
+    handler: src/handlers/block-handler.getBlocksPaginated
+    events:
+      - http:
+          path: /blocks-paginated
+          method: get
+          caching:
+            enabled: false # Caching needs to be enabled on all endpoints
+          request:
+            parameters:
+              querystrings:
+                page: true
   getBlocks:
     name: ${sls:stage}-blocks
     description: Get blocks
-    memorySize: 1024
+    memorySize: 2048
     handler: src/handlers/block-handler.getBlocks
     events:
       - http:
           path: /blocks
           method: get
+          
   getBlockByHash:
     name: ${sls:stage}-block-hash
     description: Get block by hash
-    memorySize: 1024
+    memorySize: 2048
     handler: src/handlers/block-handler.getBlockByHash
     events:
       - http:
           path: /blocks/{hash}
           method: get
+          
   getTransactions:
     name: ${sls:stage}-transactions
     description: Get transactions
-    memorySize: 1024
+    memorySize: 2048
     handler: src/handlers/transaction-handler.getTransactions
     events:
       - http:
           path: /transactions
           method: get
+          
   getTransactionByHash:
     name: ${sls:stage}-transaction-hash
     description: Get Transaction by hash
-    memorySize: 1024
+    memorySize: 2048
     handler: src/handlers/transaction-handler.getTransactionByHash
     events:
       - http:
           path: /transactions/{hash}
           method: get
+
+  getTransactionsPaginated:
+    name: ${sls:stage}-transactions-paginated
+    description: Get transactions paginated
+    memorySize: 2048
+    handler: src/handlers/transaction-handler.getTransactionsPaginated
+    events:
+      - http:
+          path: /transactions-paginated
+          method: get
+          caching:
+            enabled: false # Caching needs to be enabled on all endpoints
+          request:
+            parameters:
+              querystrings:
+                page: true
+          

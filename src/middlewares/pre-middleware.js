@@ -1,7 +1,14 @@
 const { dbConnection } = require('../db')
-let {counter} = require("../counter");
+const {performance} = require('perf_hooks');
+
 module.exports.dbConnect = async (event, context, callback) => {
+    const start = performance.now();
+    event["start"] = start;
+
     await dbConnection();
-    counter++;
-    console.log("Middleware Counter " + counter);
+
+    const end = performance.now();
+
+    console.log(`DB CONNECTION: ${end - start}`);
+    
 }
