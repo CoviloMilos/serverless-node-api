@@ -16,6 +16,7 @@
     "serverless-dotenv-plugin": "^4.0.1",
     "serverless-http": "^2.7.0",
     "serverless-middleware": "^3.0.0",
-    "serverless-offline": "^8.8.1"
+    "serverless-offline": "^8.8.1",
+    "serverless-plugin-warmup": "^7.1.0"
   }
 }

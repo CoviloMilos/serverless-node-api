@@ -152,7 +152,9 @@ const randomPageNumber = (requestParams, ctx, ee, next) => {
 };
 
 function printStatus (requestParams, response, context, ee, next) {
-  console.log(`Status Code: ${response.statusCode}`);  
+  if (response.statusCode.toString().startsWith('5')) {
+    console.log(`Status Code: ${response.statusCode}`);
+  }
   return next();
 }
 module.exports = {

@@ -9,6 +9,7 @@ const getTransactions = async (event, context, callback) => {
 }
 
 const getTransactionByHash = async (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
     // await dbConnection();
     const transactionHash = event.pathParameters.hash;
 
@@ -20,6 +21,7 @@ const getTransactionByHash = async (event, context, callback) => {
 }
 
 const getTransactionsPaginated = async (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
     const { page } = event.queryStringParameters
     const perPage = 20;
 

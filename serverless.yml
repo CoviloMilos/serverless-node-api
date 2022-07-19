@@ -8,21 +8,40 @@ provider:
   deploymentMethod: direct # Direct deployments are daster and have no downsides
   stage: dev
   runtime: nodejs14.x
-  tracing: 
+  # region: us-east-2 picked up from aws config
+  tracing: # logs from both api gateway and lambdas
     apiGateway: true
     lambda: true
+  # iamRoleStatements:
+  #   - Effect: 'Allow'
+  #     Action:
+  #       - 'lambda:InvokeFunction'
+  #     Resource:
+  #       - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:service}-${opt:stage, self:provider.stage}-*
+  # apiGateway
+  # deploymentBucket S3
+  # logs format, level, 
 
 plugins:
+  - serverless-plugin-warmup
   - serverless-offline
   - serverless-middleware
   - serverless-dotenv-plugin
   - serverless-api-gateway-caching
 
 package:
-  exclude:
+  individually: true
+  patterns:
     - "./load-test"
 
 custom:
+  warmup:
+    default:
+      enabled: true
+      name: block-explorer
+      events:
+        - schedule: 'cron(0/5 8-17 ? * MON-FRI *)'
+      prewarm: true
   serverless-offline:
     noPrependStageInUrl: true
     httpPort: 3000
@@ -39,6 +58,7 @@ custom:
   #   perKeyInvalidation:
   #     requireAuthorization: false # default is true
   #     handleUnauthorizedRequests: Ignore # default is "IgnoreWithWarning".
+
 
 functions:
   # express:
@@ -67,22 +87,12 @@ functions:
     name: ${sls:stage}-health
     description: Health check
     memorySize: 2048  # By default, your functions have 128 MB of memory allocated. Can be up to 10GB
-    # By logs Max Memory Used is 111MB
-    # Adding more memory proportionally increases the amount of CPU
-    # Memory	Duration	Cost
-    # 128 MB	11.722 s	$0.024628
-    # 256 MB	6.678 s	$0.028035
-    # 512 MB	3.194 s	$0.026830
-    # 1024 MB	1.465 s	$0.024638
-    # In this case, at 128 MB, the function takes 11.722 seconds on average to complete, at a cost of $0.024628 for 1,000 invocations. 
-    # When the memory is increased to 1024 MB, the duration average drops to 1.465 seconds, so the cost is $0.024638. 
-    # For a one-thousandth of a cent cost difference, the function has a 10-fold improvement in performance.
-    # https://aws.amazon.com/blogs/compute/operating-lambda-performance-optimization-part-2/#:~:text=You%20can%20configure%20the%20amount,128%20MB%20for%20their%20functions.
     handler: src/handlers/block-handler.healthCheck
     events:
       - http:
           path: /health
           method: get
+
 
   plainSearch:
     name: ${sls:stage}-plain-search
@@ -99,6 +109,9 @@ functions:
             parameters:
               querystrings:
                 q: true
+    warmup: 
+      default: 
+        enabled: true
   getBlocksPaginated:
     name: ${sls:stage}-blocks-paginated
     description: Get blocks paginated

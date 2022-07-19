@@ -33,6 +33,12 @@ and then deploy with:
 serverless deploy
 ```
 
+or one function
+
+```
+serverless deploy function -f <functionName>
+```
+
 After running deploy, you should see output similar to:
 
 ```bash

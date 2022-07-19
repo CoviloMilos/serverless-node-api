@@ -1,16 +1,16 @@
 config:
   target: ""
   phases:
-    - duration: 30
+    - duration: 10
       arrivalCount: 1000
   processor: "./data-generate.js"
 
 scenarios:
-  - name: "Get blocks"
+  - name: "Health"
     flow:
       - get:
-          url: "/blocks"
           beforeResponse: printStatus
+          url: "/health"
   - name: "Get block by hash"
     flow:
       - get:
@@ -23,9 +23,9 @@ scenarios:
           beforeRequest: randomPageNumber
           afterResponse: printStatus
           url: "/blocks-paginated?page={{ pageNumber }}"
-  - name: "Get transaction by hash"
-    flow:
-      - get:
-          beforeRequest: randomTxHash
-          afterResponse: printStatus
-          url: "/transactions/{{ txHash }}"
+  # - name: "Get transactions paginated"
+  #   flow:
+  #     - get:
+  #         beforeRequest: randomPageNumber
+  #         afterResponse: printStatus
+  #         url: "/transactions-paginated?page={{ pageNumber }}"

@@ -1,6 +1,7 @@
 const BlockModel = require("../models/block")
 const response = require("../models/response");
 const {performance} = require('perf_hooks');
+let counter = require("../counter")
 
 const getBlocks = async (event, context, callback) => {  
     // await dbConnection();
@@ -16,17 +17,29 @@ const getBlocks = async (event, context, callback) => {
 }
 
 const getBlockByHash = async (event, context, callback) => {
-    // await dbConnection();
-    const blockHash = event.pathParameters.hash;
+    try {
+        counter++;
+        console.log("COUNTER: " + counter);
+        context.callbackWaitsForEmptyEventLoop = false;
+        // await dbConnection();
+        const blockHash = event.pathParameters.hash;
 
-    const block = await BlockModel.findOne({blockHash});
+        const block = await BlockModel.findOne({blockHash});
 
-    if (!block) return response(404, {message: "Block not found"});
+        if (!block) return response(404, {message: "Block not found"});
 
-    return response(200, block);
+        return response(200, block);
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify(error)
+        }
+    }
 }
 
 const getBlocksPaginated = async (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
     const { page } = event.queryStringParameters
     const perPage = 20;
 
